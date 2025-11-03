@@ -1,8 +1,8 @@
 import "dotenv/config";
 export default {
   expo: {
-    name: "avisita-app",
-    slug: "avisita-app",
+    name: "avisita-connect",
+    slug: "avisita-connect",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -16,12 +16,13 @@ export default {
     android: {
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
+        foregroundImage: "./assets/images/icon.png",
+        backgroundImage: "./assets/images/icon.png",
+        monochromeImage: "./assets/images/icon.png",
       },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
+      package: "com.avisita.app",
     },
     web: {
       output: "static",

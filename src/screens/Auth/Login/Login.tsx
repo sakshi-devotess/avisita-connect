@@ -1,8 +1,6 @@
-import { config } from "@/src/config/constants";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Login() {
-  console.log("object :>> ", config.publicUrl);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>

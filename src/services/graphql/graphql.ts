@@ -84,7 +84,6 @@ const errorLink = onError(
                 });
                 return access_token;
               } catch (error) {
-                console.error("Token refresh failed:", error);
                 await clearUserProfile();
                 return null;
               }
@@ -151,7 +150,6 @@ const authLink = setContext(async (_, { headers }) => {
 });
 
 const cache = new InMemoryCache();
-console.log("httpLink :>> ", httpLink);
 export const client = new ApolloClient({
   cache: cache,
   link: authLink.concat(from([errorLink, httpLink])),
