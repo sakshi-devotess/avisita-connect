@@ -26,8 +26,9 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # - name: Link EAS project (CI)
-      #   run: eas init --id ${{ secrets.EXPO_PROJECT_ID }} --non-interactive
+      - name: Link EAS project (CI)
+        run: eas init --id ${{ secrets.EXPO_PROJECT_ID }} --non-interactive
+
       # Export GitHub Secrets as env vars
       - name: Export envs
         run: |

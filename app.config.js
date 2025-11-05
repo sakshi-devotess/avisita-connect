@@ -49,10 +49,10 @@ export default {
       reactCompiler: true,
     },
     extra: {
-      eas: {
-        projectId:
-          process.env.EXPO_PROJECT_ID || "5efe53d7-05aa-4c17-937d-475e81431cb3",
-      },
+      // eas: {
+      //   projectId:
+      //     process.env.EXPO_PROJECT_ID || "5efe53d7-05aa-4c17-937d-475e81431cb3",
+      // },
       publicUrl: process.env.REACT_APP_PUBLIC_URL,
       graphQlUrl: process.env.REACT_APP_GRAPHQL_URL,
     },
