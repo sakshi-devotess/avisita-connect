@@ -2,7 +2,7 @@ import "dotenv/config";
 export default {
   expo: {
     name: "avisita-connect",
-    slug: "avisita-connect",
+    slug: "avisita",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
