@@ -36,7 +36,7 @@ jobs:
         # Push secrets to EAS build environment
       - name: Push env to EAS
         run: |
-          eas env:create --environment preview --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility public --non-interactive --force
+          eas env:create --environment preview --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
 
       # Trigger cloud builds (no need to wait in CI)
       - name: Build on EAS
