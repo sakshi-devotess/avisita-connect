@@ -40,4 +40,4 @@ jobs:
 
       # Trigger cloud builds (no need to wait in CI)
       - name: Build on EAS
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+        run: eas build --platform android --profile preview
