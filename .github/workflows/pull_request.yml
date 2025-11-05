@@ -29,6 +29,7 @@ jobs:
       # Export GitHub Secrets as env vars
       - name: Export envs
         run: |
+          echo "EAS_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
           echo "REACT_APP_PUBLIC_URL=${{ secrets.STAGING_API_PUBLIC_URL }}" >> $GITHUB_ENV
 
         # Push secrets to EAS build environment
