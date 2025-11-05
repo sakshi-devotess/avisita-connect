@@ -22,6 +22,9 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Link EAS project (CI)
+        run: eas init --id ${{ secrets.EXPO_PROJECT_ID }} --non-interactive
+
       - name: Install deps
         run: npm ci
 
