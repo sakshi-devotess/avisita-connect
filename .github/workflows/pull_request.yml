@@ -5,38 +5,46 @@ on:
     types: [opened, ready_for_review, reopened, edited, synchronize]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  staging:
+    uses: ./.github/workflows/eas-build.yml
+    with:
+      environment: staging
+      profile: preview
+      platform: android
+      submit: false
+    secrets: inherit
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22.14.0
-          cache: npm
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22.14.0
+  #         cache: npm
 
-      # Installs Expo + EAS CLI and wires auth from EXPO_TOKEN
-      - name: Setup Expo / EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+  #     # Installs Expo + EAS CLI and wires auth from EXPO_TOKEN
+  #     - name: Setup Expo / EAS
+  #       uses: expo/expo-github-action@v8
+  #       with:
+  #         eas-version: latest
+  #         expo-version: latest
+  #         token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Install deps
-        run: npm ci
+  #     - name: Install deps
+  #       run: npm ci
 
-      # Export GitHub Secrets as env vars
-      - name: Export envs
-        run: |
-          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
-          echo "REACT_APP_PUBLIC_URL=${{ secrets.STAGING_API_PUBLIC_URL }}" >> $GITHUB_ENV
+  #     # Export GitHub Secrets as env vars
+  #     - name: Export envs
+  #       run: |
+  #         echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
+  #         echo "REACT_APP_PUBLIC_URL=${{ secrets.STAGING_API_PUBLIC_URL }}" >> $GITHUB_ENV
 
-        # Push secrets to EAS build environment
-      - name: Push env to EAS
-        run: |
-          eas env:create --environment preview --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
+  #       # Push secrets to EAS build environment
+  #     - name: Push env to EAS
+  #       run: |
+  #         eas env:create --environment preview --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
 
-      # Trigger cloud builds (no need to wait in CI)
-      - name: Build on EAS
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+  #     # Trigger cloud builds (no need to wait in CI)
+  #     - name: Build on EAS
+  #       run: eas build --platform android --profile preview --non-interactive --no-wait
