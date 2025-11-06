@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload APK artifact
         if: ${{ inputs.platform == 'android' || inputs.platform == 'all' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release-${{ inputs.profile }}
           path: ${{ github.workspace }}/app-release.apk
