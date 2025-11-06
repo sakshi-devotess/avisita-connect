@@ -34,6 +34,14 @@ export default {
       "expo-secure-store",
       "expo-notifications",
       [
+        "@sentry/react-native/expo",
+        {
+          url: "https://sentry.io/",
+          project: "avisita",
+          organization: "avisita",
+        },
+      ],
+      [
         "expo-splash-screen",
         {
           image: "./assets/images/splash-icon.png",
