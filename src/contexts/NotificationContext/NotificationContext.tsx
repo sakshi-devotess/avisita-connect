@@ -1,3 +1,4 @@
+import { registerForPushNotificationsAsync } from "@/src/utils/registerForPushNotificationsAsync";
 import * as Notifications from "expo-notifications";
 import React, {
   createContext,
@@ -7,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { registerForPushNotificationsAsync } from "../../utils/registerForPushNotificationsAsync";
 
 interface NotificationContextType {
   expoPushToken: string | null;

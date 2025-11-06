@@ -1,6 +1,6 @@
+import { config } from "@/src/config/constants";
 import * as Sentry from "@sentry/react-native";
 import { Button, StyleSheet, Text, View } from "react-native";
-import { config } from "../../../config/constants";
 export default function Login() {
   return (
     <>

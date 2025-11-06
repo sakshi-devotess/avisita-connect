@@ -1,5 +1,5 @@
+import { config } from "@/src/config/constants";
 import axios from "axios";
-import { config } from "../../config/constants";
 
 export async function refreshToken(refreshToken: string): Promise<any> {
   const ENDPOINT = "/auth";

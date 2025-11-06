@@ -7,7 +7,7 @@ import MessageProvider from "./contexts/MessageContext/MessageContext";
 import { NotificationProvider } from "./contexts/NotificationContext/NotificationContext";
 import RootNavigator from "./navigation/RootNavigator";
 import { client } from "./services/graphql/graphql";
-
+console.log("config.sentryDsn :>> ", config.sentryDsn);
 Sentry.init({
   // dsn: "https://d1e37d6529616beff5319baff098a524@o4510317028048896.ingest.de.sentry.io/4510317029556304",
   dsn: config.sentryDsn,

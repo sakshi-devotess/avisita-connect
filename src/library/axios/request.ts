@@ -1,10 +1,10 @@
+import { config } from "@/src/config/constants";
+import { getNewToken } from "@/src/services/graphql/graphql";
+import { getUserProfile } from "@/src/storage/userStorage";
+import { logout } from "@/src/utils/logout";
+import { pushMessage } from "@/src/utils/message";
 import axios, { AxiosResponse } from "axios";
 import Toast from "react-native-toast-message";
-import { config } from "../../config/constants";
-import { getNewToken } from "../../services/graphql/graphql";
-import { getUserProfile } from "../../storage/userStorage";
-import { logout } from "../../utils/logout";
-import { pushMessage } from "../../utils/message";
 
 const request = axios.create({
   baseURL: config.publicUrl,

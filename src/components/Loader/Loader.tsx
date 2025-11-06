@@ -1,6 +1,6 @@
+import { colors } from "@/src/config/constants";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors } from "../../config/constants";
 import { ILoaderProps } from "./Loader.model";
 
 const Loader: React.FC<ILoaderProps> = ({
