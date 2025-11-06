@@ -25,6 +25,8 @@ on:
         required: true
       GRAPHQL_URL:
         required: true
+      SENTRY_DSN:
+        required: true
 
 jobs:
   build:

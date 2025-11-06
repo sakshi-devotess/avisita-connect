@@ -17,6 +17,7 @@ jobs:
       EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
       API_PUBLIC_URL: ${{ secrets.STAGING_API_PUBLIC_URL }}
       GRAPHQL_URL: ${{ secrets.STAGING_GRAPHQL_URL }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
   # build:
   #   runs-on: ubuntu-latest
   #   steps:
