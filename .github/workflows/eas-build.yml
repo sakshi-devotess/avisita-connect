@@ -62,7 +62,21 @@ jobs:
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
 
-      - name: Build on EAS
+      # ✅ Local Android build and artifact upload
+      - name: Local Android Build (APK)
+        if: ${{ inputs.platform == 'android' || inputs.platform == 'all' }}
+        run: |
+          eas build --platform android --profile ${{ inputs.profile }} --local --output ${{ github.workspace }}/app-release.apk
+
+      - name: Upload APK artifact
+        if: ${{ inputs.platform == 'android' || inputs.platform == 'all' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release-${{ inputs.profile }}
+          path: ${{ github.workspace }}/app-release.apk
+
+        # ✅ Cloud build if iOS or if you choose platform = all
+      - name: Cloud Build
         run: |
           if [[ "${{ inputs.platform }}" == "all" ]]; then
             eas build --platform android --profile ${{ inputs.profile }} --non-interactive --no-wait
