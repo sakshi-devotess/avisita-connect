@@ -64,6 +64,7 @@ export default {
       },
       publicUrl: process.env.REACT_APP_PUBLIC_URL,
       graphQlUrl: process.env.REACT_APP_GRAPHQL_URL,
+      sentryDsn: process.env.SENTRY_DSN,
     },
   },
 };

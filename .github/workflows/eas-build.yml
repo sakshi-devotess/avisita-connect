@@ -55,12 +55,14 @@ jobs:
 
           echo "REACT_APP_PUBLIC_URL=${{ secrets.API_PUBLIC_URL }}" >> $GITHUB_ENV
           echo "REACT_APP_GRAPHQL_URL=${{ secrets.GRAPHQL_URL }}" >> $GITHUB_ENV
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
 
       - name: Push env to EAS
         run: |
           # Only push envs that exist for the given environment
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
+          eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force
 
       - name: Build on EAS
         run: |

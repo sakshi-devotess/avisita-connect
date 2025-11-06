@@ -1,6 +1,7 @@
 import { ApolloProvider } from "@apollo/client/main.cjs";
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from "expo-notifications";
+import { config } from "./config/constants";
 import { AuthenticatedUserProvider } from "./contexts/AuthContext/AuthenticatedUserContext";
 import MessageProvider from "./contexts/MessageContext/MessageContext";
 import { NotificationProvider } from "./contexts/NotificationContext/NotificationContext";
@@ -8,7 +9,8 @@ import RootNavigator from "./navigation/RootNavigator";
 import { client } from "./services/graphql/graphql";
 
 Sentry.init({
-  dsn: "https://d1e37d6529616beff5319baff098a524@o4510317028048896.ingest.de.sentry.io/4510317029556304",
+  // dsn: "https://d1e37d6529616beff5319baff098a524@o4510317028048896.ingest.de.sentry.io/4510317029556304",
+  dsn: config.sentryDsn,
 
   // Adds more context data to events (IP address, cookies, user, etc.)
   // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
