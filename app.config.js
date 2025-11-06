@@ -23,6 +23,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: "com.avisita.app",
+      googleServicesFile: "google-services.json",
     },
     web: {
       output: "static",
@@ -31,6 +32,7 @@ export default {
     plugins: [
       "expo-router",
       "expo-secure-store",
+      "expo-notifications",
       [
         "expo-splash-screen",
         {
