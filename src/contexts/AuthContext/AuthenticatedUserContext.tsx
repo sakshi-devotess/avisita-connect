@@ -1,5 +1,3 @@
-import { GET_CURRENT_USER } from "@/src/services/graphql/queries";
-import { setLogoutFn } from "@/src/utils/logout";
 import { useQuery } from "@apollo/client";
 import React, {
   createContext,
@@ -8,11 +6,13 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { GET_CURRENT_USER } from "../../services/graphql/queries/index";
 import {
   clearUserProfile,
   getUserProfile,
   saveUserProfile,
 } from "../../storage/userStorage";
+import { setLogoutFn } from "../../utils/logout";
 import { IAuthContext, ICurrentUser } from "./AuthenticatedUserContext.model";
 
 export const AuthenticatedUserContext = createContext<IAuthContext>({

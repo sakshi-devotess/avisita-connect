@@ -1,9 +1,3 @@
-import { config } from "@/src/config/constants";
-import {
-  clearUserProfile,
-  getUserProfile,
-  saveUserProfile,
-} from "@/src/storage/userStorage";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import {
@@ -14,6 +8,12 @@ import {
   InMemoryCache,
   Observable,
 } from "@apollo/client/main.cjs";
+import { config } from "../../config/constants";
+import {
+  clearUserProfile,
+  getUserProfile,
+  saveUserProfile,
+} from "../../storage/userStorage";
 import { refreshToken } from "../auth/refreshToken";
 
 let refreshPromise: Promise<{
