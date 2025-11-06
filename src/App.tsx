@@ -11,24 +11,14 @@ import { client } from "./services/graphql/graphql";
 Sentry.init({
   // dsn: "https://d1e37d6529616beff5319baff098a524@o4510317028048896.ingest.de.sentry.io/4510317029556304",
   dsn: config.sentryDsn,
-
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
-
-  // Enable Logs
   enableLogs: true,
-
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [
     Sentry.mobileReplayIntegration(),
     Sentry.feedbackIntegration(),
   ],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
 });
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
