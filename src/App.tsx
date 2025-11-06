@@ -28,7 +28,7 @@ Notifications.setNotificationHandler({
     shouldShowList: true,
   }),
 });
-export default Sentry.wrap(function App() {
+export default function App() {
   return (
     <NotificationProvider>
       <ApolloProvider client={client}>
@@ -40,4 +40,4 @@ export default Sentry.wrap(function App() {
       </ApolloProvider>
     </NotificationProvider>
   );
-});
+}
