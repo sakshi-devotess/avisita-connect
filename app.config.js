@@ -39,6 +39,9 @@ export default {
           url: "https://sentry.io/",
           project: "avisita",
           organization: "avisita",
+          experimental_android: {
+            enableAndroidGradlePlugin: true,
+          },
         },
       ],
       [
@@ -60,6 +63,7 @@ export default {
     },
     extra: {
       eas: {
+        // projectId: "06f83e98-c2b6-4f31-950c-0cf2cdc85820",
         projectId: process.env.EXPO_PROJECT_ID,
       },
       publicUrl: process.env.REACT_APP_PUBLIC_URL,
