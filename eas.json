@@ -13,7 +13,9 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {},
+      "env": {
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      },
       "cache": {
         "disabled": true
       }
