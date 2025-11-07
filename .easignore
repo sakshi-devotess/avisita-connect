@@ -62,4 +62,3 @@ storage
 .flaskenv*
 !.env.project
 !.env.vault
-.env.local

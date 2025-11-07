@@ -1,6 +1,6 @@
 import { config } from "@/src/config/constants";
 import { getNewToken } from "@/src/services/graphql/graphql";
-import { getUserProfile } from "@/src/storage/userStorage";
+import { getUserProfile } from "@/src/userStorage/userStorage";
 import { logout } from "@/src/utils/logout";
 import { pushMessage } from "@/src/utils/message";
 import axios, { AxiosResponse } from "axios";

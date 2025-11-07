@@ -1,9 +1,9 @@
 import { GET_CURRENT_USER } from "@/src/services/graphql/queries";
-// import {
-//   clearUserProfile,
-//   getUserProfile,
-//   saveUserProfile,
-// } from "@/src/storage/userStorage";
+import {
+  clearUserProfile,
+  getUserProfile,
+  saveUserProfile,
+} from "@/src/userStorage/userStorage";
 import { setLogoutFn } from "@/src/utils/logout";
 import { useQuery } from "@apollo/client";
 import React, {
@@ -32,8 +32,7 @@ export const AuthenticatedUserProvider: React.FC<PropsWithChildren<{}>> = ({
   useEffect(() => {
     const checkUser = async () => {
       try {
-        // const parsedUser = await getUserProfile();
-        const parsedUser = null; // Placeholder since getUserProfile is commented out
+        const parsedUser = await getUserProfile();
         if (parsedUser?.companyHasUserId) {
           setUser(parsedUser);
           setLoginState(true);
@@ -86,14 +85,13 @@ export const AuthenticatedUserProvider: React.FC<PropsWithChildren<{}>> = ({
         companyHasUserIds: companyHasUserIds,
         firstActiveCompanyHasUserId: firstActiveCompanyHasUser?.id || null,
       };
-      // const parsedUser = await getUserProfile();
-      const parsedUser = [null]; // Placeholder since getUserProfile is commented out
+      const parsedUser = await getUserProfile();
       if (parsedUser) {
         const updatedUserData = {
           ...parsedUser,
           ...currentUser,
         };
-        // await saveUserProfile(updatedUserData);
+        await saveUserProfile(updatedUserData);
       }
       setUser(currentUser);
     };
@@ -102,7 +100,7 @@ export const AuthenticatedUserProvider: React.FC<PropsWithChildren<{}>> = ({
 
   useEffect(() => {
     setLogoutFn(async () => {
-      // await clearUserProfile();
+      await clearUserProfile();
       setUser(null);
       setLoginState(false);
     });
