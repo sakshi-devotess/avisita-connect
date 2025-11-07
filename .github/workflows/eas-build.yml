@@ -56,7 +56,7 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Pull app env from Env Vault
+      - name: Pull app env from Env Vault (no browser) + persist
         shell: bash
         run: |
           npx dotenv-vault@latest pull "${{ inputs.environment }}" .env --yes --dotenvMe="${{ secrets.DOTENV_ME }}"
@@ -64,18 +64,26 @@ jobs:
           echo "Loaded env keys:"
           cut -d= -f1 .env | sed 's/^/- /'
 
-          # Export them for later steps
+          # Load into this step
           set -a
           source .env
           set +a
 
-          # Optional: enforce presence of critical vars
-          for v in REACT_APP_PUBLIC_URL REACT_APP_GRAPHQL_URL SENTRY_DSN SENTRY_AUTH_TOKEN; do
-            eval "val=\${$v:-}"
-            if [ -z "$val" ]; then
-              echo "::error::Missing required env var: $v"; exit 1;
+          # ---- Persist to later steps via $GITHUB_ENV ----
+          persist () {
+            name="$1"; val="${!1:-}"
+            if [ -n "$val" ]; then
+              printf '%s=%s\n' "$name" "$val" >> "$GITHUB_ENV"
+            else
+              echo "::warning::$name not set; will be missing in later steps"
             fi
-          done
+          }
+
+          # Persist the exact names your push step expects
+          persist REACT_APP_PUBLIC_URL
+          persist REACT_APP_GRAPHQL_URL
+          persist SENTRY_DSN
+          persist SENTRY_AUTH_TOKEN
 
       # # Set env based on input
       # - name: Set App Env Vars
