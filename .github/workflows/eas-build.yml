@@ -27,6 +27,8 @@ on:
         required: true
       SENTRY_DSN:
         required: true
+      SENTRY_AUTH_TOKEN:
+        required: false
 
 jobs:
   build:
@@ -58,6 +60,7 @@ jobs:
           echo "REACT_APP_PUBLIC_URL=${{ secrets.API_PUBLIC_URL }}" >> $GITHUB_ENV
           echo "REACT_APP_GRAPHQL_URL=${{ secrets.GRAPHQL_URL }}" >> $GITHUB_ENV
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
+          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_ENV
 
       - name: Push env to EAS
         run: |
@@ -65,6 +68,7 @@ jobs:
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force
+          eas env:create --name SENTRY_AUTH_TOKEN --value "$SENTRY_AUTH_TOKEN" --visibility sensitive --non-interactive --force
 
       - name: Build on EAS
         run: |
