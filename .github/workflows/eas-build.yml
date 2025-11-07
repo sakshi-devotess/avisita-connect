@@ -74,27 +74,8 @@ jobs:
           persist REACT_APP_GRAPHQL_URL
           persist SENTRY_DSN
           persist SENTRY_AUTH_TOKEN
+          persist EXPO_PROJECT_ID
 
-      # - name: Push env to EAS
-      #   shell: bash
-      #   run: |
-      #     # Helper to push only set vars
-      #     push_var () {
-      #       name="$1"; visibility="$2"; val="${!1:-}"
-      #       if [ -n "$val" ]; then
-      #         eas env:create --environment ${{ inputs.profile }} \
-      #           --name "$name" --value "$val" \
-      #           --visibility "$visibility" --non-interactive --force
-      #       else
-      #         echo "Skip $name (unset)"
-      #       fi
-      #     }
-
-      #     # Sensitive by default
-      #     push_var REACT_APP_PUBLIC_URL   sensitive
-      #     push_var REACT_APP_GRAPHQL_URL  sensitive
-      #     push_var SENTRY_DSN             sensitive
-      #     push_var SENTRY_AUTH_TOKEN      sensitive
       - name: Push env to EAS (create only if missing)
         shell: bash
         run: |
