@@ -19,16 +19,18 @@ on:
     secrets:
       EXPO_TOKEN:
         required: true
-      EXPO_PROJECT_ID:
-        required: true
-      API_PUBLIC_URL:
-        required: true
-      GRAPHQL_URL:
-        required: true
-      SENTRY_DSN:
-        required: true
-      SENTRY_AUTH_TOKEN:
+      DOTENV_KEY_STAGING:
         required: false
+      # EXPO_PROJECT_ID:
+      #   required: true
+      # API_PUBLIC_URL:
+      #   required: true
+      # GRAPHQL_URL:
+      #   required: true
+      # SENTRY_DSN:
+      #   required: true
+      # SENTRY_AUTH_TOKEN:
+      #   required: false
 
 jobs:
   build:
@@ -52,19 +54,46 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # Set env based on input
-      - name: Set App Env Vars
+      - name: Pull env from Env Vault
+        shell: bash
         run: |
-          echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
+          npm i -g dotenv-vault@latest
+          # pick the right DOTENV_KEY
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            export DOTENV_KEY="${{ secrets.DOTENV_KEY_STAGING }}"
+          else
+            export DOTENV_KEY="${{ secrets.DOTENV_KEY_PRODUCTION }}"
+          fi
 
-          echo "REACT_APP_PUBLIC_URL=${{ secrets.API_PUBLIC_URL }}" >> $GITHUB_ENV
-          echo "REACT_APP_GRAPHQL_URL=${{ secrets.GRAPHQL_URL }}" >> $GITHUB_ENV
-          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
-          echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_ENV
+          # Pull to a local .env for this job (no prompts)
+          npx dotenv-vault pull --yes --environment "${{ inputs.environment }}"
+
+          # Export all keys from .env to this job's environment
+          set -a
+          source .env
+          set +a
+
+      # # Set env based on input
+      # - name: Set App Env Vars
+      #   run: |
+      #     echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
+
+      #     echo "REACT_APP_PUBLIC_URL=${{ secrets.API_PUBLIC_URL }}" >> $GITHUB_ENV
+      #     echo "REACT_APP_GRAPHQL_URL=${{ secrets.GRAPHQL_URL }}" >> $GITHUB_ENV
+      #     echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
+      #     echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_ENV
+
+      # - name: Push env to EAS
+      #   run: |
+      #     # Only push envs that exist for the given environment
+      #     eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
+      #     eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
+      #     eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force
+      #     eas env:create --environment ${{ inputs.profile }} --name SENTRY_AUTH_TOKEN --value "$SENTRY_AUTH_TOKEN" --visibility sensitive --non-interactive --force
 
       - name: Push env to EAS
         run: |
-          # Only push envs that exist for the given environment
+          # Sensitive by default; set --visibility public for EXPO_PUBLIC_* if desired
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
           eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force

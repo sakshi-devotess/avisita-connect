@@ -14,11 +14,12 @@ jobs:
       submit: false
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
-      API_PUBLIC_URL: ${{ secrets.STAGING_API_PUBLIC_URL }}
-      GRAPHQL_URL: ${{ secrets.STAGING_GRAPHQL_URL }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      DOTENV_KEY_STAGING: ${{ secrets.DOTENV_KEY_STAGING }}
+      # EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
+      # API_PUBLIC_URL: ${{ secrets.STAGING_API_PUBLIC_URL }}
+      # GRAPHQL_URL: ${{ secrets.STAGING_GRAPHQL_URL }}
+      # SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      # SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   # build:
   #   runs-on: ubuntu-latest
   #   steps:
