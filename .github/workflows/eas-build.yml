@@ -21,6 +21,8 @@ on:
         required: true
       DOTENV_KEY_STAGING:
         required: false
+      DOTENV_KEY_PRODUCTION:
+        required: false
       # EXPO_PROJECT_ID:
       #   required: true
       # API_PUBLIC_URL:
@@ -54,24 +56,52 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      # ─────────────────────────────────────────────────────────
+      # Pull app env from Env Vault (NON-INTERACTIVE)
+      # ─────────────────────────────────────────────────────────
       - name: Pull env from Env Vault
         shell: bash
         run: |
-          npm i -g dotenv-vault@latest
-          # pick the right DOTENV_KEY
+          set -euo pipefail
+
+          # Ensure the encrypted vault file exists in the current dir
+          if [ ! -f ".env.vault" ]; then
+            echo "::error::.env.vault not found in repo root (checkout path)."
+            exit 1
+          fi
+
+          # Pick the correct DOTENV_KEY for the requested environment
           if [ "${{ inputs.environment }}" = "staging" ]; then
             export DOTENV_KEY="${{ secrets.DOTENV_KEY_STAGING }}"
           else
             export DOTENV_KEY="${{ secrets.DOTENV_KEY_PRODUCTION }}"
           fi
 
-          # Pull to a local .env for this job (no prompts)
-          npx dotenv-vault pull --yes --environment "${{ inputs.environment }}"
+          if [ -z "${DOTENV_KEY:-}" ]; then
+            echo "::error::DOTENV_KEY is empty; check GitHub Secrets."
+            exit 1
+          fi
 
-          # Export all keys from .env to this job's environment
+          # Pull to a local .env for this job (no prompts, no browser)
+          npx dotenv-vault@latest pull --yes --environment "${{ inputs.environment }}" --output .env
+
+          # Sanity: show the keys (names only) we loaded (don’t print values)
+          echo "Loaded keys from vault:"
+          cut -d= -f1 .env | sed 's/^/- /'
+
+          # Export all keys to this job's environment
           set -a
           source .env
           set +a
+
+          # Optional hard checks: fail if any required vars are missing
+          required_vars=(REACT_APP_PUBLIC_URL REACT_APP_GRAPHQL_URL SENTRY_DSN SENTRY_AUTH_TOKEN)
+          for v in "${required_vars[@]}"; do
+            if [ -z "${!v:-}" ]; then
+              echo "::error::Missing required env var: $v"
+              exit 1
+            fi
+          done
 
       # # Set env based on input
       # - name: Set App Env Vars
@@ -92,12 +122,26 @@ jobs:
       #     eas env:create --environment ${{ inputs.profile }} --name SENTRY_AUTH_TOKEN --value "$SENTRY_AUTH_TOKEN" --visibility sensitive --non-interactive --force
 
       - name: Push env to EAS
+        shell: bash
         run: |
-          # Sensitive by default; set --visibility public for EXPO_PUBLIC_* if desired
-          eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
-          eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
-          eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force
-          eas env:create --environment ${{ inputs.profile }} --name SENTRY_AUTH_TOKEN --value "$SENTRY_AUTH_TOKEN" --visibility sensitive --non-interactive --force
+          set -euo pipefail
+
+          push_var () {
+            local name="$1"; local value="${!1:-}"; local visibility="$2"
+            if [ -n "$value" ]; then
+              eas env:create --environment ${{ inputs.profile }} \
+                --name "$name" --value "$value" \
+                --visibility "$visibility" --non-interactive --force
+            else
+              echo "Skipping $name (unset)"
+            fi
+          }
+
+          # Sensitive by default
+          push_var REACT_APP_PUBLIC_URL   sensitive
+          push_var REACT_APP_GRAPHQL_URL  sensitive
+          push_var SENTRY_DSN             sensitive
+          push_var SENTRY_AUTH_TOKEN      sensitive
 
       - name: Build on EAS
         run: |
