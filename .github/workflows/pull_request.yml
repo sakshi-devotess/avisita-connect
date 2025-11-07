@@ -9,7 +9,7 @@ jobs:
     uses: ./.github/workflows/eas-build.yml
     with:
       environment: staging
-      profile: preview
+      profile: production
       platform: android
       submit: false
     secrets:
