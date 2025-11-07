@@ -98,38 +98,40 @@ jobs:
       - name: Push env to EAS (create only if missing)
         shell: bash
         run: |
-          # Tries to create; if it already exists, we skip. Any other error -> fail.
           push_if_missing () {
             local name="$1"; local visibility="$2"; local val="${!1:-}"
+
             if [ -z "$val" ]; then
               echo "Skip $name (unset)"
               return 0
             fi
 
-            # Attempt create WITHOUT --force so it fails if it exists
-            set +e
-            errfile="$(mktemp)"
-            eas env:create \
+            # Try to create WITHOUT --force; capture BOTH stdout+stderr
+            out="$(eas env:create \
               --environment "${{ inputs.profile }}" \
               --name "$name" \
               --value "$val" \
               --visibility "$visibility" \
-              --non-interactive 2> "$errfile"
+              --non-interactive 2>&1)"
             status=$?
-            set -e
+
+            # Show CLI output for transparency
+            echo "$out"
 
             if [ $status -eq 0 ]; then
               echo "Created $name"
-            else
-              if grep -qi "already exists" "$errfile"; then
-                echo "Skip $name (already exists)"
-              else
-                echo "::error::Failed to create $name"
-                cat "$errfile"
-                exit $status
-              fi
+              return 0
             fi
-            rm -f "$errfile"
+
+            # If the error is just "already exists", skip gracefully
+            if echo "$out" | grep -qi "already exists"; then
+              echo "Skip $name (already exists)"
+              return 0
+            fi
+
+            # Any other error: fail the job
+            echo "::error::Failed to create $name"
+            exit $status
           }
 
           # Sensitive by default
