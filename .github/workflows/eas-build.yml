@@ -98,7 +98,7 @@ jobs:
       - name: Push env to EAS (create only if missing)
         shell: bash
         run: |
-          push_if_missing () {
+          create_or_skip () {
             local name="$1"; local visibility="$2"; local val="${!1:-}"
 
             if [ -z "$val" ]; then
@@ -106,39 +106,40 @@ jobs:
               return 0
             fi
 
-            # Try to create WITHOUT --force; capture BOTH stdout+stderr
+            # Temporarily disable errexit so we can inspect the exit code ourselves
+            set +e
             out="$(eas env:create \
               --environment "${{ inputs.profile }}" \
               --name "$name" \
               --value "$val" \
               --visibility "$visibility" \
               --non-interactive 2>&1)"
-            status=$?
+            rc=$?
+            # Re-enable errexit for the rest of the step
+            set -e
 
-            # Show CLI output for transparency
             echo "$out"
 
-            if [ $status -eq 0 ]; then
+            if [ $rc -eq 0 ]; then
               echo "Created $name"
               return 0
             fi
 
-            # If the error is just "already exists", skip gracefully
+            # Treat "already exists" as a harmless skip
             if echo "$out" | grep -qi "already exists"; then
               echo "Skip $name (already exists)"
               return 0
             fi
 
-            # Any other error: fail the job
             echo "::error::Failed to create $name"
-            exit $status
+            return $rc
           }
 
           # Sensitive by default
-          push_if_missing REACT_APP_PUBLIC_URL  sensitive
-          push_if_missing REACT_APP_GRAPHQL_URL sensitive
-          push_if_missing SENTRY_DSN            sensitive
-          push_if_missing SENTRY_AUTH_TOKEN     sensitive
+          create_or_skip REACT_APP_PUBLIC_URL  sensitive
+          create_or_skip REACT_APP_GRAPHQL_URL sensitive
+          create_or_skip SENTRY_DSN            sensitive
+          create_or_skip SENTRY_AUTH_TOKEN     sensitive
 
       - name: Build on EAS
         run: |
