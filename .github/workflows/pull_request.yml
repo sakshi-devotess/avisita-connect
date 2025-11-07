@@ -15,6 +15,7 @@ jobs:
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       DOTENV_KEY_STAGING: ${{ secrets.DOTENV_KEY_STAGING }}
+      DOTENV_ME: ${{ secrets.DOTENV_ME }}
       # EXPO_PROJECT_ID: ${{ secrets.EXPO_PROJECT_ID }}
       # API_PUBLIC_URL: ${{ secrets.STAGING_API_PUBLIC_URL }}
       # GRAPHQL_URL: ${{ secrets.STAGING_GRAPHQL_URL }}

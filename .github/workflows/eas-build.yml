@@ -21,7 +21,7 @@ on:
         required: true
       DOTENV_KEY_STAGING:
         required: false
-      DOTENV_KEY_PRODUCTION:
+      DOTENV_ME:
         required: false
       # EXPO_PROJECT_ID:
       #   required: true
@@ -56,21 +56,15 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # ─────────────────────────────────────────────────────────
-      # Pull app env from Env Vault (NON-INTERACTIVE)
-      # ─────────────────────────────────────────────────────────
-      - name: Pull env from Env Vault
+      - name: Pull app env from Env Vault (no browser)
         shell: bash
         run: |
-          set -euo pipefail
-
-          # Ensure the encrypted vault file exists in the current dir
+          # Ensure the encrypted vault exists
           if [ ! -f ".env.vault" ]; then
-            echo "::error::.env.vault not found in repo root (checkout path)."
-            exit 1
+            echo "::error::.env.vault missing at repo root"; exit 1;
           fi
 
-          # Pick the correct DOTENV_KEY for the requested environment
+          # Pick correct DOTENV_KEY
           if [ "${{ inputs.environment }}" = "staging" ]; then
             export DOTENV_KEY="${{ secrets.DOTENV_KEY_STAGING }}"
           else
@@ -78,28 +72,25 @@ jobs:
           fi
 
           if [ -z "${DOTENV_KEY:-}" ]; then
-            echo "::error::DOTENV_KEY is empty; check GitHub Secrets."
-            exit 1
+            echo "::error::DOTENV_KEY is empty; check GitHub Secrets"; exit 1;
           fi
 
-          # Pull to a local .env for this job (no prompts, no browser)
+          # Non-interactive pull (no browser)
           npx dotenv-vault@latest pull --yes --environment "${{ inputs.environment }}" --output .env
 
-          # Sanity: show the keys (names only) we loaded (don’t print values)
-          echo "Loaded keys from vault:"
+          echo "Loaded env keys:"
           cut -d= -f1 .env | sed 's/^/- /'
 
-          # Export all keys to this job's environment
+          # Export all vars for subsequent steps
           set -a
           source .env
           set +a
 
-          # Optional hard checks: fail if any required vars are missing
-          required_vars=(REACT_APP_PUBLIC_URL REACT_APP_GRAPHQL_URL SENTRY_DSN SENTRY_AUTH_TOKEN)
-          for v in "${required_vars[@]}"; do
-            if [ -z "${!v:-}" ]; then
-              echo "::error::Missing required env var: $v"
-              exit 1
+          # Optional: enforce presence of critical vars
+          for v in REACT_APP_PUBLIC_URL REACT_APP_GRAPHQL_URL SENTRY_DSN SENTRY_AUTH_TOKEN; do
+            eval "val=\${$v:-}"
+            if [ -z "$val" ]; then
+              echo "::error::Missing required env var: $v"; exit 1;
             fi
           done
 
@@ -124,16 +115,15 @@ jobs:
       - name: Push env to EAS
         shell: bash
         run: |
-          set -euo pipefail
-
+          # Helper to push only set vars
           push_var () {
-            local name="$1"; local value="${!1:-}"; local visibility="$2"
-            if [ -n "$value" ]; then
+            name="$1"; visibility="$2"; val="${!1:-}"
+            if [ -n "$val" ]; then
               eas env:create --environment ${{ inputs.profile }} \
-                --name "$name" --value "$value" \
+                --name "$name" --value "$val" \
                 --visibility "$visibility" --non-interactive --force
             else
-              echo "Skipping $name (unset)"
+              echo "Skip $name (unset)"
             fi
           }
 
