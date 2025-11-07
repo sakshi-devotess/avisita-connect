@@ -56,32 +56,15 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Pull app env from Env Vault (no browser)
+      - name: Pull app env from Env Vault
         shell: bash
         run: |
-          # Ensure the encrypted vault exists
-          if [ ! -f ".env.vault" ]; then
-            echo "::error::.env.vault missing at repo root"; exit 1;
-          fi
-
-          # Pick correct DOTENV_KEY
-          if [ "${{ inputs.environment }}" = "staging" ]; then
-            export DOTENV_KEY="${{ secrets.DOTENV_KEY_STAGING }}"
-          else
-            export DOTENV_KEY="${{ secrets.DOTENV_KEY_PRODUCTION }}"
-          fi
-
-          if [ -z "${DOTENV_KEY:-}" ]; then
-            echo "::error::DOTENV_KEY is empty; check GitHub Secrets"; exit 1;
-          fi
-
-          # Non-interactive pull (no browser)
-          npx dotenv-vault@latest pull --yes --environment "${{ inputs.environment }}" --output .env
+          npx dotenv-vault@latest pull "${{ inputs.environment }}" .env --yes --dotenvMe="${{ secrets.DOTENV_ME }}"
 
           echo "Loaded env keys:"
           cut -d= -f1 .env | sed 's/^/- /'
 
-          # Export all vars for subsequent steps
+          # Export them for later steps
           set -a
           source .env
           set +a
