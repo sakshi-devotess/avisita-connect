@@ -1,9 +1,9 @@
 import { config } from "@/src/config/constants";
-import {
-  clearUserProfile,
-  getUserProfile,
-  saveUserProfile,
-} from "@/src/storage/userStorage";
+// import {
+//   clearUserProfile,
+//   getUserProfile,
+//   saveUserProfile,
+// } from "@/src/storage/userStorage";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import {
@@ -38,7 +38,7 @@ export const getNewToken = (
         refresh_token: newRefreshToken,
       };
 
-      await saveUserProfile(updatedUserData);
+      // await saveUserProfile(updatedUserData);
 
       return {
         access_token,
@@ -47,7 +47,7 @@ export const getNewToken = (
     })
     .catch(async (err) => {
       console.error("Refresh failed:", err);
-      await clearUserProfile();
+      // await clearUserProfile();
       throw err;
     })
     .finally(() => {
@@ -66,7 +66,8 @@ const errorLink = onError(
             //get refresh token from store
             const refreshAndRetry = async () => {
               try {
-                const parsedData = await getUserProfile();
+                // const parsedData = await getUserProfile();
+                const parsedData = null; // Placeholder since getUserProfile is commented out
                 if (!parsedData) throw new Error("No user data in SecureStore");
 
                 const { access_token } = await getNewToken(
@@ -84,7 +85,7 @@ const errorLink = onError(
                 });
                 return access_token;
               } catch (error) {
-                await clearUserProfile();
+                // await clearUserProfile();
                 return null;
               }
             };
@@ -138,7 +139,8 @@ const httpLink = new HttpLink({ uri: config.graphQlUrl, fetch });
 
 const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const storedUserData = await getUserProfile();
+  // const storedUserData = await getUserProfile();
+  const storedUserData = null; // Placeholder since getUserProfile is commented out
   const token = storedUserData ? storedUserData.access_token : null;
   // return the headers to the context so httpLink can read them
   return {
