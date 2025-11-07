@@ -23,16 +23,6 @@ on:
         required: false
       DOTENV_ME:
         required: false
-      # EXPO_PROJECT_ID:
-      #   required: true
-      # API_PUBLIC_URL:
-      #   required: true
-      # GRAPHQL_URL:
-      #   required: true
-      # SENTRY_DSN:
-      #   required: true
-      # SENTRY_AUTH_TOKEN:
-      #   required: false
 
 jobs:
   build:
@@ -85,44 +75,68 @@ jobs:
           persist SENTRY_DSN
           persist SENTRY_AUTH_TOKEN
 
-      # # Set env based on input
-      # - name: Set App Env Vars
-      #   run: |
-      #     echo "EXPO_PROJECT_ID=${{ secrets.EXPO_PROJECT_ID }}" >> $GITHUB_ENV
-
-      #     echo "REACT_APP_PUBLIC_URL=${{ secrets.API_PUBLIC_URL }}" >> $GITHUB_ENV
-      #     echo "REACT_APP_GRAPHQL_URL=${{ secrets.GRAPHQL_URL }}" >> $GITHUB_ENV
-      #     echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
-      #     echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_ENV
-
       # - name: Push env to EAS
+      #   shell: bash
       #   run: |
-      #     # Only push envs that exist for the given environment
-      #     eas env:create --environment ${{ inputs.profile }} --name REACT_APP_PUBLIC_URL --value "$REACT_APP_PUBLIC_URL" --visibility sensitive --non-interactive --force
-      #     eas env:create --environment ${{ inputs.profile }} --name REACT_APP_GRAPHQL_URL --value "$REACT_APP_GRAPHQL_URL" --visibility sensitive --non-interactive --force
-      #     eas env:create --environment ${{ inputs.profile }} --name SENTRY_DSN --value "$SENTRY_DSN" --visibility sensitive --non-interactive --force
-      #     eas env:create --environment ${{ inputs.profile }} --name SENTRY_AUTH_TOKEN --value "$SENTRY_AUTH_TOKEN" --visibility sensitive --non-interactive --force
+      #     # Helper to push only set vars
+      #     push_var () {
+      #       name="$1"; visibility="$2"; val="${!1:-}"
+      #       if [ -n "$val" ]; then
+      #         eas env:create --environment ${{ inputs.profile }} \
+      #           --name "$name" --value "$val" \
+      #           --visibility "$visibility" --non-interactive --force
+      #       else
+      #         echo "Skip $name (unset)"
+      #       fi
+      #     }
 
-      - name: Push env to EAS
+      #     # Sensitive by default
+      #     push_var REACT_APP_PUBLIC_URL   sensitive
+      #     push_var REACT_APP_GRAPHQL_URL  sensitive
+      #     push_var SENTRY_DSN             sensitive
+      #     push_var SENTRY_AUTH_TOKEN      sensitive
+      - name: Push env to EAS (create only if missing)
         shell: bash
         run: |
-          # Helper to push only set vars
-          push_var () {
-            name="$1"; visibility="$2"; val="${!1:-}"
-            if [ -n "$val" ]; then
-              eas env:create --environment ${{ inputs.profile }} \
-                --name "$name" --value "$val" \
-                --visibility "$visibility" --non-interactive --force
-            else
+          # Tries to create; if it already exists, we skip. Any other error -> fail.
+          push_if_missing () {
+            local name="$1"; local visibility="$2"; local val="${!1:-}"
+            if [ -z "$val" ]; then
               echo "Skip $name (unset)"
+              return 0
             fi
+
+            # Attempt create WITHOUT --force so it fails if it exists
+            set +e
+            errfile="$(mktemp)"
+            eas env:create \
+              --environment "${{ inputs.profile }}" \
+              --name "$name" \
+              --value "$val" \
+              --visibility "$visibility" \
+              --non-interactive 2> "$errfile"
+            status=$?
+            set -e
+
+            if [ $status -eq 0 ]; then
+              echo "Created $name"
+            else
+              if grep -qi "already exists" "$errfile"; then
+                echo "Skip $name (already exists)"
+              else
+                echo "::error::Failed to create $name"
+                cat "$errfile"
+                exit $status
+              fi
+            fi
+            rm -f "$errfile"
           }
 
           # Sensitive by default
-          push_var REACT_APP_PUBLIC_URL   sensitive
-          push_var REACT_APP_GRAPHQL_URL  sensitive
-          push_var SENTRY_DSN             sensitive
-          push_var SENTRY_AUTH_TOKEN      sensitive
+          push_if_missing REACT_APP_PUBLIC_URL  sensitive
+          push_if_missing REACT_APP_GRAPHQL_URL sensitive
+          push_if_missing SENTRY_DSN            sensitive
+          push_if_missing SENTRY_AUTH_TOKEN     sensitive
 
       - name: Build on EAS
         run: |
