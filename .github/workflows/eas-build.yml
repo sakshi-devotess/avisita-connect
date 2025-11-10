@@ -76,10 +76,12 @@ jobs:
           persist SENTRY_AUTH_TOKEN
           persist EXPO_PROJECT_ID
 
-      - name: Push env to EAS (create only if missing)
+      - name: Push env to EAS (create or overwrite)
         shell: bash
         run: |
-          create_or_skip () {
+          set -e
+
+          push_or_update () {
             local name="$1"; local visibility="$2"; local val="${!1:-}"
 
             if [ -z "$val" ]; then
@@ -87,7 +89,9 @@ jobs:
               return 0
             fi
 
-            # Temporarily disable errexit so we can inspect the exit code ourselves
+            echo "Deploying $name to EAS env: ${{ inputs.profile }}"
+
+            # Try create first
             set +e
             out="$(eas env:create \
               --environment "${{ inputs.profile }}" \
@@ -96,31 +100,37 @@ jobs:
               --visibility "$visibility" \
               --non-interactive 2>&1)"
             rc=$?
-            # Re-enable errexit for the rest of the step
             set -e
 
-            echo "$out"
-
+            # If success, done
             if [ $rc -eq 0 ]; then
-              echo "Created $name"
+              echo "✅ Created $name"
               return 0
             fi
 
-            # Treat "already exists" as a harmless skip
+            # If exists → update it
             if echo "$out" | grep -qi "already exists"; then
-              echo "Skip $name (already exists)"
+              echo "🔁 Updating $name…"
+              eas env:edit \
+                --environment "${{ inputs.profile }}" \
+                --name "$name" \
+                --value "$val" \
+                --visibility "$visibility" \
+                --non-interactive
+              echo "✅ Updated $name"
               return 0
             fi
 
-            echo "::error::Failed to create $name"
+            # Any other error
+            echo "::error::Failed to push $name"
+            echo "$out"
             return $rc
           }
 
-          # Sensitive by default
-          create_or_skip REACT_APP_PUBLIC_URL  sensitive
-          create_or_skip REACT_APP_GRAPHQL_URL sensitive
-          create_or_skip SENTRY_DSN            sensitive
-          create_or_skip SENTRY_AUTH_TOKEN     sensitive
+          push_or_update REACT_APP_PUBLIC_URL  sensitive
+          push_or_update REACT_APP_GRAPHQL_URL sensitive
+          push_or_update SENTRY_DSN            sensitive
+          push_or_update SENTRY_AUTH_TOKEN     sensitive
 
       - name: Build on EAS
         run: |
