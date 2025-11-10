@@ -89,7 +89,7 @@ jobs:
               return 0
             fi
 
-            echo "Deploying $name to EAS env: ${{ inputs.environment }}"
+            echo "Deploying $name to EAS env: ${{ inputs.profile }}"
 
             # Try CREATE first (ENV is positional)
             set +e
