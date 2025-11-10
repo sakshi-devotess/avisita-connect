@@ -111,7 +111,7 @@ jobs:
               echo "🔁 Updating $name…"
               eas env:update \
                 --environment "${{ inputs.profile }}" \
-                --name "$name" \
+                --variable-name "$name" \ 
                 --value "$val" \
                 --visibility "$visibility" \
                 --non-interactive
