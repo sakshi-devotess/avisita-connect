@@ -63,7 +63,6 @@ export default {
     },
     extra: {
       eas: {
-        // projectId: "8f458007-3fe4-491f-b60d-77a7853aa4f6",
         projectId: process.env.EXPO_PROJECT_ID,
       },
       publicUrl: process.env.REACT_APP_PUBLIC_URL,
