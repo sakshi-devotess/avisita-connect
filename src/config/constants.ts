@@ -15,4 +15,5 @@ export const colors = {
 export const config = {
   publicUrl: Constants.expoConfig?.extra?.publicUrl,
   graphQlUrl: Constants.expoConfig?.extra?.graphQlUrl,
+  sentryDsn: Constants.expoConfig?.extra?.sentryDsn,
 };

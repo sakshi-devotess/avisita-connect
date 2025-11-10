@@ -1,10 +1,20 @@
-import { StyleSheet, Text, View } from "react-native";
-
+import { config } from "@/src/config/constants";
+import * as Sentry from "@sentry/react-native";
+import { Alert, Button, StyleSheet, Text, View } from "react-native";
 export default function Login() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-    </View>
+    <>
+      <View style={styles.container}>
+        <Text style={styles.title}>url : {config.publicUrl}</Text>
+        <Button
+          title="Try!"
+          onPress={() => {
+            Alert.alert("Sentry Test", config.publicUrl || "no url");
+            Sentry.captureException(new Error("First error"));
+          }}
+        />
+      </View>
+    </>
   );
 }
 

@@ -3,7 +3,7 @@ import {
   clearUserProfile,
   getUserProfile,
   saveUserProfile,
-} from "@/src/storage/userStorage";
+} from "@/src/userStorage/userStorage";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import {

@@ -1,6 +1,6 @@
+import { pushMessage } from "@/src/utils/message";
 import React, { createContext, useCallback, useMemo } from "react";
 import Toast from "react-native-toast-message";
-import { pushMessage } from "../../utils/message";
 import { IMessageProviderProps } from "./MessageContext.model";
 
 export const MessageContext = createContext({

@@ -2,7 +2,7 @@ import "dotenv/config";
 export default {
   expo: {
     name: "avisita-connect",
-    slug: "avisita-connect",
+    slug: "avisita",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -23,6 +23,7 @@ export default {
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: "com.avisita.app",
+      googleServicesFile: "google-services.json",
     },
     web: {
       output: "static",
@@ -31,6 +32,18 @@ export default {
     plugins: [
       "expo-router",
       "expo-secure-store",
+      "expo-notifications",
+      [
+        "@sentry/react-native/expo",
+        {
+          url: "https://sentry.io/",
+          project: "avisita",
+          organization: "avisita",
+          experimental_android: {
+            enableAndroidGradlePlugin: true,
+          },
+        },
+      ],
       [
         "expo-splash-screen",
         {
@@ -49,8 +62,12 @@ export default {
       reactCompiler: true,
     },
     extra: {
+      eas: {
+        projectId: process.env.EXPO_PROJECT_ID,
+      },
       publicUrl: process.env.REACT_APP_PUBLIC_URL,
       graphQlUrl: process.env.REACT_APP_GRAPHQL_URL,
+      sentryDsn: process.env.SENTRY_DSN,
     },
   },
 };

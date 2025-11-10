@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 10.1.1"
+    "version": ">= 10.1.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -12,16 +13,19 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {},
+      "env": {
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      },
       "cache": {
         "disabled": true
       }
     },
     "production": {
+      "autoIncrement": true,
       "android": {
         "buildType": "apk"
       },
-      "env": { "REACT_APP_PUBLIC_URL": "https://avisita.example.com" },
+      "env": {},
       "cache": {
         "disabled": true
       }
