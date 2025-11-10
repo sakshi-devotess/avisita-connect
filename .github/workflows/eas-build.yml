@@ -89,9 +89,9 @@ jobs:
               return 0
             fi
 
-            echo "Deploying $name to EAS env: ${{ inputs.profile }}"
+            echo "Deploying $name to EAS env: ${{ inputs.environment }}"
 
-            # Try create first
+            # Try to create first
             set +e
             out="$(eas env:create \
               --environment "${{ inputs.profile }}" \
@@ -102,16 +102,14 @@ jobs:
             rc=$?
             set -e
 
-            # If success, done
             if [ $rc -eq 0 ]; then
               echo "✅ Created $name"
               return 0
             fi
 
-            # If exists → update it
             if echo "$out" | grep -qi "already exists"; then
               echo "🔁 Updating $name…"
-              eas env:edit \
+              eas env:update \
                 --environment "${{ inputs.profile }}" \
                 --name "$name" \
                 --value "$val" \
@@ -121,12 +119,12 @@ jobs:
               return 0
             fi
 
-            # Any other error
             echo "::error::Failed to push $name"
             echo "$out"
             return $rc
           }
 
+          # push/overwrite these keys
           push_or_update REACT_APP_PUBLIC_URL  sensitive
           push_or_update REACT_APP_GRAPHQL_URL sensitive
           push_or_update SENTRY_DSN            sensitive
