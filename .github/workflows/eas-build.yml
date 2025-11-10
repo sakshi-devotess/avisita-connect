@@ -91,10 +91,9 @@ jobs:
 
             echo "Deploying $name to EAS env: ${{ inputs.environment }}"
 
-            # Try to create first
+            # Try CREATE first (ENV is positional)
             set +e
-            out="$(eas env:create \
-              --environment "${{ inputs.profile }}" \
+            out="$(eas env:create "${{ inputs.profile }}" \
               --name "$name" \
               --value "$val" \
               --visibility "$visibility" \
@@ -107,11 +106,11 @@ jobs:
               return 0
             fi
 
+            # If it already exists, UPDATE it (ENV is positional; use --variable-name)
             if echo "$out" | grep -qi "already exists"; then
               echo "🔁 Updating $name…"
-              eas env:update \
-                --environment "${{ inputs.profile }}" \
-                --variable-name "$name" \ 
+              eas env:update "${{ inputs.profile }}" \
+                --variable-name "$name" \
                 --value "$val" \
                 --visibility "$visibility" \
                 --non-interactive
@@ -124,7 +123,6 @@ jobs:
             return $rc
           }
 
-          # push/overwrite these keys
           push_or_update REACT_APP_PUBLIC_URL  sensitive
           push_or_update REACT_APP_GRAPHQL_URL sensitive
           push_or_update SENTRY_DSN            sensitive
