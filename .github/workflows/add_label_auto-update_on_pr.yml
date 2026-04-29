@@ -1,0 +1,26 @@
+name: Add label auto-update to new pull request
+
+on:
+    pull_request:
+        types: [opened, ready_for_review, reopened, edited, synchronize]
+        branches:
+            - main
+
+jobs:
+    add-label-auto-update:
+      permissions : write-all
+      uses: 'sakshi-devotess/github-action/.github/workflows/add-label-auto-update.yml@main'
+      with:
+        label: "auto-update"
+
+    prettier:
+      uses: 'sakshi-devotess/github-action/.github/workflows/prettier.yml@main'
+      with:
+        prettier_options: '--check **/*.js'
+      secrets: 
+        token: ${{ secrets.PAT_TOKEN }}
+    
+    purge-css:
+      uses: 'sakshi-devotess/github-action/.github/workflows/purgecss.yml@main'
+      secrets: 
+        token: ${{ secrets.PAT_TOKEN }}
