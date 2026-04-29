@@ -8,6 +8,6 @@ on:
 
 jobs:
   claude-review:
-    uses: sakshi-devotess/github-action/.github/workflows/claude-review.yml@main
+    uses: "sakshi-devotess/github-action/.github/workflows/claude-review.yml@main"
     secrets:
       anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
