@@ -26,6 +26,10 @@ jobs:
       token: ${{ secrets.PAT_TOKEN }}
 
   claude-review:
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     uses: "sakshi-devotess/github-action/.github/workflows/claude-review.yml@main"
     secrets:
       anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
