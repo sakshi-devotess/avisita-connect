@@ -1,8 +1,10 @@
-name: "Pull Request Workflow"
+name: Add label auto-update to new pull request
 
 on:
   pull_request:
     types: [opened, ready_for_review, reopened, edited, synchronize]
+    branches:
+      - main
 
 jobs:
   claude-review:
